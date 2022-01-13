@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "embed" // support embedding files in variables
 	"encoding/json"
 	"fmt"
 	"log"
@@ -15,14 +16,18 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-var schema = `
-CREATE TABLE lego (
-    name text,
-    model integer,
-    catalog text
-);`
-
 var mutex sync.RWMutex
+
+// var schema = `
+// DROP TABLE IF EXISTS lego;
+// CREATE TABLE lego (
+//     name text,
+//     model integer,
+//     catalog text
+// );`
+
+//go:embed schema.sql
+var schema string
 
 func main() {
 	log.Println("Hello Qi, Sqlx")
@@ -114,9 +119,6 @@ func main() {
 	}()
 
 }
-
-// //go:embed schema.sql
-// var schema string
 
 func createSchema(db *sqlx.DB) error {
 	for n, statement := range strings.Split(schema, ";") {
