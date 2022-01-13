@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/ebobo/sqlite3_go/pkg/utility"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -15,13 +16,13 @@ func main() {
 	log.Println("Creating sqlite-database.db...")
 
 	// make data dir if it is not exit
-	err := makeDirIfNotExists("data")
+	err := utility.MakeDirIfNotExists("../data")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
 	// Create SQLite file
-	file, err := os.Create("data/sqlite-database.db")
+	file, err := os.Create("../data/sqlite-database.db")
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -31,7 +32,7 @@ func main() {
 	log.Println("sqlite-database.db created")
 
 	// Open the created SQLite File
-	sqliteDatabase, _ := sql.Open("sqlite3", "data/sqlite-database.db")
+	sqliteDatabase, _ := sql.Open("sqlite3", "../data/sqlite-database.db")
 
 	// Defer Closing the database
 	defer sqliteDatabase.Close()
@@ -48,6 +49,8 @@ func main() {
 	insertCar(sqliteDatabase, "UF 28749", "3 Series", "BMW")
 
 	displayGarageCars(sqliteDatabase)
+	log.Println("---------------------------------")
+	displayGarageCarByBrand(sqliteDatabase, "BMW")
 }
 
 func createTable(db *sql.DB) {
@@ -84,6 +87,22 @@ func insertCar(db *sql.DB, license string, model string, brand string) {
 
 func displayGarageCars(db *sql.DB) {
 	row, err := db.Query("SELECT * FROM garage ORDER BY brand")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer row.Close()
+	for row.Next() { // Iterate and fetch the records from result cursor
+		var id int
+		var license string
+		var model string
+		var brand string
+		row.Scan(&id, &license, &model, &brand)
+		log.Println("Car: ", id, " ", license, " ", model, " ", brand)
+	}
+}
+
+func displayGarageCarByBrand(db *sql.DB, brand string) {
+	row, err := db.Query("SELECT * FROM garage WHERE brand = $1", brand)
 	if err != nil {
 		log.Fatal(err)
 	}

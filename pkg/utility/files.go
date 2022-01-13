@@ -1,10 +1,10 @@
-package main
+package utility
 
 import (
 	"os"
 )
 
-func makeDirIfNotExists(dirpath string) error {
+func MakeDirIfNotExists(dirpath string) error {
 	if _, err := os.Stat(dirpath); os.IsNotExist(err) {
 		err := os.Mkdir(dirpath, os.ModeDir|os.ModePerm)
 		if err != nil {
