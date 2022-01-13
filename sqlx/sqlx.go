@@ -22,7 +22,7 @@ CREATE TABLE lego (
     catalog text
 );`
 
-var mutex sync.Mutex
+var mutex sync.RWMutex
 
 func main() {
 	log.Println("Hello Qi, Sqlx")
@@ -62,9 +62,10 @@ func main() {
 	addLegoSet(sqliteDatabase, &model.LegoSet{Name: "Lamborghini", Model: 42115, Catalog: "Technic"})
 
 	displayLegoSets(sqliteDatabase)
-	log.Println("---------------------------------")
 
-	set, err := getLegoSet(sqliteDatabase, 21309)
+	log.Println("-------------Get set 42115----------------")
+
+	set, err := getLegoSet(sqliteDatabase, 42115)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -77,6 +78,40 @@ func main() {
 		return
 	}
 	fmt.Println(string(js))
+
+	// log.Println("-------------Get creator sets----------------")
+
+	// sets, err := displayLegoSetsByCatalog(sqliteDatabase, "Creator")
+
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+
+	// for _, set := range sets {
+	// 	js, err := json.Marshal(set)
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return
+	// 	}
+	// 	fmt.Println(string(js))
+	// }
+
+	log.Println("-------------Get creator sets----------------")
+
+	func() {
+		set, err := displayLegoSetsByCatalog2(sqliteDatabase, "Creator")
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		js, err := json.Marshal(set)
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println(string(js))
+	}()
 
 }
 
@@ -116,21 +151,35 @@ func getLegoSet(db *sqlx.DB, modelNum int) (*model.LegoSet, error) {
 	return &set, db.QueryRowx("SELECT * FROM lego WHERE model = ?", modelNum).StructScan(&set)
 }
 
-func deleteFloor(db *sqlx.DB, modelNum int) error {
-	mutex.Lock()
-	defer mutex.Unlock()
+// func deleteFloor(db *sqlx.DB, modelNum int) error {
+// 	mutex.Lock()
+// 	defer mutex.Unlock()
 
-	_, err := db.Exec("DELETE FROM lego WHERE id = ?", modelNum)
-	return err
-}
+// 	_, err := db.Exec("DELETE FROM lego WHERE id = ?", modelNum)
+// 	return err
+// }
 
-// func displayLegoSetsByCatalog(db *sqlx.DB, catelog string) ([]model.LegoSet, error) {
+// func displayLegoSetsByCatalog(db *sqlx.DB, catalog string) ([]model.LegoSet, error) {
 // 	mutex.RLock()
 // 	defer mutex.RUnlock()
 
 // 	var sets []model.LegoSet
-// 	return sets, db.Select(&sets, "SELECT * FROM lego WHERE catelog = ? ORDER BY id", catelog)
+// 	return sets, db.Select(&sets, "SELECT * FROM lego WHERE catalog = ? ORDER BY name", catalog)
 // }
+
+func displayLegoSetsByCatalog2(db *sqlx.DB, catalog string) (*model.LegoSet, error) {
+	mutex.RLock()
+	defer mutex.RUnlock()
+
+	var sets []model.LegoSet
+	err := db.Select(&sets, "SELECT * FROM lego WHERE catalog = ? limit 1", catalog)
+
+	if err == nil {
+		log.Println("length of slice ", len(sets))
+	}
+
+	return &sets[0], err
+}
 
 func displayLegoSets(db *sqlx.DB) {
 	row, err := db.Query("SELECT * FROM lego ORDER BY name")
