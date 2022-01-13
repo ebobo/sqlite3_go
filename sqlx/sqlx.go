@@ -192,6 +192,6 @@ func displayLegoSets(db *sqlx.DB) {
 		var model int
 		var catalog string
 		row.Scan(&name, &model, &catalog)
-		log.Println("Car: ", name, " ", model, " ", catalog)
+		log.Println("Lego: ", name, " ", model, " ", catalog)
 	}
 }
