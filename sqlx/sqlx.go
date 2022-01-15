@@ -31,6 +31,7 @@ var schema string
 
 func main() {
 	log.Println("Hello Qi, Sqlx")
+
 	os.Remove("sqlite-database.db")
 
 	log.Println("Creating sqlite-database.db...")
@@ -153,7 +154,7 @@ func getLegoSet(db *sqlx.DB, modelNum int) (*model.LegoSet, error) {
 	return &set, db.QueryRowx("SELECT * FROM lego WHERE model = ?", modelNum).StructScan(&set)
 }
 
-// func deleteFloor(db *sqlx.DB, modelNum int) error {
+// func deleteSet(db *sqlx.DB, modelNum int) error {
 // 	mutex.Lock()
 // 	defer mutex.Unlock()
 
@@ -193,7 +194,21 @@ func displayLegoSets(db *sqlx.DB) {
 		var name string
 		var model int
 		var catalog string
-		row.Scan(&name, &model, &catalog)
+		row.Scan(&model, &catalog)
 		log.Println("Lego: ", name, " ", model, " ", catalog)
 	}
 }
+
+// func displayLegoSetsNameAndModelNumber(db *sqlx.DB) {
+// 	row, err := db.Query("SELECT name, model FROM lego ORDER BY name")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer row.Close()
+// 	for row.Next() { // Iterate and fetch the records from result cursor
+// 		var name string
+// 		var model int
+// 		row.Scan(&name, &model)
+// 		log.Println("Lego: ", name, " ", model)
+// 	}
+// }

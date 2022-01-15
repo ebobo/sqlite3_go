@@ -40,13 +40,13 @@ func main() {
 	createTable(sqliteDatabase) // Create Database Tables
 
 	// INSERT RECORDS
-	insertCar(sqliteDatabase, "   NB   ", "Model X", "Tesla")
-	insertCar(sqliteDatabase, "  COOL  ", "MX5", "Mazda")
-	insertCar(sqliteDatabase, "UF 58890", "X3", "BMW")
-	insertCar(sqliteDatabase, "ZZ 21986", "MX5", "Mazda")
-	insertCar(sqliteDatabase, "LY 69697", "Fortwo", "Smart")
-	insertCar(sqliteDatabase, "UF 52111", "X1", "BMW")
-	insertCar(sqliteDatabase, "UF 28749", "3 Series", "BMW")
+	insertCar(sqliteDatabase, "BB 00007", "Model X", "Tesla")
+	insertCar(sqliteDatabase, "BB 00006", "MX5", "Mazda")
+	insertCar(sqliteDatabase, "BB 00005", "X3", "BMW")
+	insertCar(sqliteDatabase, "BB 00004", "MX5", "Mazda")
+	insertCar(sqliteDatabase, "BB 00003", "Fortwo", "Smart")
+	insertCar(sqliteDatabase, "BB 00002", "X1", "BMW")
+	insertCar(sqliteDatabase, "BB 00001", "3 Series", "BMW")
 
 	displayGarageCars(sqliteDatabase)
 	log.Println("---------------------------------")
