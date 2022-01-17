@@ -119,6 +119,17 @@ func main() {
 		fmt.Println(string(js))
 	}()
 
+	log.Println("-------------clean lego sets----------------")
+
+	func() {
+		err := cleanLegoTable(sqliteDatabase)
+
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}()
+
+	displayLegoSets(sqliteDatabase)
 }
 
 func createSchema(db *sqlx.DB) error {
@@ -194,9 +205,19 @@ func displayLegoSets(db *sqlx.DB) {
 		var name string
 		var model int
 		var catalog string
-		row.Scan(&model, &catalog)
+		row.Scan(&name, &model, &catalog)
 		log.Println("Lego: ", name, " ", model, " ", catalog)
 	}
+}
+
+func cleanLegoTable(db *sqlx.DB) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+	_, err := db.Exec("DELETE FROM lego")
+	if err == nil {
+		log.Println("Lego table cleaned")
+	}
+	return err
 }
 
 // func displayLegoSetsNameAndModelNumber(db *sqlx.DB) {
